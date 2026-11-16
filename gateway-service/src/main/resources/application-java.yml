@@ -1,0 +1,7 @@
+springdoc:
+  swagger-ui:
+    urls:
+      - name: calcul-service
+        url: /docs/calcul
+      - name: historique-service
+        url: /docs/historique

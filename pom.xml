@@ -12,6 +12,6 @@
         <module>eureka-service</module>
         <module>calcul-service</module>
         <module>historique-service</module>
-        <!-- <module>gateway-service</module> --> <!-- etape E.1 -->
+        <module>gateway-service</module>
     </modules>
 </project>

@@ -1,68 +1,79 @@
 === D.4 (historique-service, direct) ===
 # 1
 $ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"somme","a":8,"b":2} http://localhost:8082/operations
-HTTP/1.1 400 
+HTTP/1.1 201 
+Location: http://localhost:8082/operations/1
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 16 Nov 2026 10:59:05 GMT
-Connection: close
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 
-{"timestamp":"2026-11-16T10:59:05.161Z","status":400,"error":"Bad Request","path":"/operations"}
+{"a":8,"b":2,"id":1,"operateur":"somme","resultat":10.0}
 
 # 2
 $ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"produit","a":6,"b":7} http://localhost:8082/operations
-HTTP/1.1 400 
+HTTP/1.1 201 
+Location: http://localhost:8082/operations/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 16 Nov 2026 10:59:05 GMT
-Connection: close
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 
-{"timestamp":"2026-11-16T10:59:05.198Z","status":400,"error":"Bad Request","path":"/operations"}
+{"a":6,"b":7,"id":2,"operateur":"produit","resultat":42.0}
 
 # 3
 $ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"division","a":7,"b":2} http://localhost:8082/operations
-HTTP/1.1 400 
+HTTP/1.1 201 
+Location: http://localhost:8082/operations/3
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 16 Nov 2026 10:59:05 GMT
-Connection: close
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 
-{"timestamp":"2026-11-16T10:59:05.227Z","status":400,"error":"Bad Request","path":"/operations"}
+{"a":7,"b":2,"id":3,"operateur":"division","resultat":3.5}
 
 # 4
 $ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"division","a":7,"b":0} http://localhost:8082/operations
 HTTP/1.1 400 
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 16 Nov 2026 10:59:05 GMT
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 Connection: close
 
-{"timestamp":"2026-11-16T10:59:05.259Z","status":400,"error":"Bad Request","path":"/operations"}
+{"erreur":"Erreur : division par 0 impossible"}
 
 # 5
 $ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"racine","a":9,"b":0} http://localhost:8082/operations
 HTTP/1.1 400 
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Mon, 16 Nov 2026 10:59:05 GMT
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 Connection: close
 
-{"timestamp":"2026-11-16T10:59:05.290Z","status":400,"error":"Bad Request","path":"/operations"}
+{"erreur":"Operateur inconnu : racine"}
 
 # 6
 $ curl -s -i http://localhost:8082/operations
 HTTP/1.1 200 
 Content-Type: application/json
-Content-Length: 2
-Date: Mon, 16 Nov 2026 10:59:05 GMT
+Content-Length: 176
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 
-[]
+[{"a":8,"b":2,"id":1,"operateur":"somme","resultat":10.0},{"a":6,"b":7,"id":2,"operateur":"produit","resultat":42.0},{"a":7,"b":2,"id":3,"operateur":"division","resultat":3.5}]
 
 # 7
 $ curl -s -i http://localhost:8082/operations/2
-HTTP/1.1 404 
-Content-Length: 0
-Date: Mon, 16 Nov 2026 10:59:05 GMT
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 16 Nov 2026 20:09:09 GMT
 
+{"a":6,"b":7,"id":2,"operateur":"produit","resultat":42.0}
 
-
+=== Traces des instances calcul-service (requetes 1 a 4) ===
+--- instance 8081 ---
+[calcul-service:8081] somme 8+2
+[calcul-service:8081] division 7/2
+--- instance 8083 ---
+[calcul-service:8083] produit 6*7
+[calcul-service:8083] division 7/0
+=== D.1 : six fois la requete 1 (somme 1+1) ===
+instance 8081 : 3 trace(s)
+instance 8083 : 3 trace(s)

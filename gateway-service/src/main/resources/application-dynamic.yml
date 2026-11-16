@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: calcul-service
+        url: /calcul-service/v3/api-docs
+      - name: historique-service
+        url: /historique-service/v3/api-docs

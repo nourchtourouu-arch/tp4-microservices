@@ -1,0 +1,54 @@
+=== E.5 (routes dynamiques) ===
+# 1 GET /calcul-service/calcul/somme?a=2&b=3
+$ curl -s -i http://localhost:8888/calcul-service/calcul/somme?a=2&b=3
+HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 1
+Date: Mon, 16 Nov 2026 20:16:51 GMT
+
+5
+
+# 2 GET /calcul-service/calcul/produit/6/7
+$ curl -s -i http://localhost:8888/calcul-service/calcul/produit/6/7
+HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 2
+Date: Mon, 16 Nov 2026 20:16:51 GMT
+
+42
+
+# 3 GET /historique-service/operations
+$ curl -s -i http://localhost:8888/historique-service/operations
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 707
+Date: Mon, 16 Nov 2026 20:16:52 GMT
+
+[{"a":8,"b":2,"id":1,"operateur":"somme","resultat":10.0},{"a":6,"b":7,"id":2,"operateur":"produit","resultat":42.0},{"a":7,"b":2,"id":3,"operateur":"division","resultat":3.5},{"a":1,"b":1,"id":4,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":5,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":6,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":7,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":8,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":9,"operateur":"somme","resultat":2.0},{"a":10,"b":4,"id":10,"operateur":"soustraction","resultat":6.0},{"a":10,"b":4,"id":11,"operateur":"soustraction","resultat":6.0},{"a":10,"b":4,"id":12,"operateur":"soustraction","resultat":6.0}]
+
+# 4 POST /historique-service/operations somme 1+1
+$ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"somme","a":1,"b":1} http://localhost:8888/historique-service/operations
+HTTP/1.1 201 Created
+transfer-encoding: chunked
+Location: http://10.255.255.254:8082/operations/13
+Content-Type: application/json
+Date: Mon, 16 Nov 2026 20:16:52 GMT
+
+{"a":1,"b":1,"id":13,"operateur":"somme","resultat":2.0}
+
+# 5 GET /calcul/somme?a=2&b=3 (plus de route)
+$ curl -s -i http://localhost:8888/calcul/somme?a=2&b=3
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 122
+
+{"timestamp":"2026-11-16T20:16:52.340Z","path":"/calcul/somme","status":404,"error":"Not Found","requestId":"9fadb0c8-76"}
+
+# 6 GET /gateway-service/actuator/gateway/routes
+$ curl -s -o /dev/null -w statut %{http_code} http://localhost:8888/gateway-service/actuator/gateway/routes
+statut 404
+
+
+# Swagger : zone Servers de /calcul-service/v3/api-docs
+"servers":[{"url":"http://10.255.255.254:8083","description":"Generated server url"}]
+

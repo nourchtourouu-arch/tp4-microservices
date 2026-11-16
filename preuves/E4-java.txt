@@ -1,0 +1,59 @@
+=== E (java) : requetes via la passerelle ===
+# 1 GET /calcul/somme?a=2&b=3
+$ curl -s -i http://localhost:8888/calcul/somme?a=2&b=3
+HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 1
+Date: Mon, 16 Nov 2026 20:14:57 GMT
+
+5
+
+# 2 GET /calcul/division?a=7&b=0
+$ curl -s -i http://localhost:8888/calcul/division?a=7&b=0
+HTTP/1.1 400 Bad Request
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 34
+Date: Mon, 16 Nov 2026 20:14:57 GMT
+
+Erreur : division par 0 impossible
+
+# 3 GET /operations
+$ curl -s -i http://localhost:8888/operations
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 642
+Date: Mon, 16 Nov 2026 20:14:58 GMT
+
+[{"a":8,"b":2,"id":1,"operateur":"somme","resultat":10.0},{"a":6,"b":7,"id":2,"operateur":"produit","resultat":42.0},{"a":7,"b":2,"id":3,"operateur":"division","resultat":3.5},{"a":1,"b":1,"id":4,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":5,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":6,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":7,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":8,"operateur":"somme","resultat":2.0},{"a":1,"b":1,"id":9,"operateur":"somme","resultat":2.0},{"a":10,"b":4,"id":10,"operateur":"soustraction","resultat":6.0},{"a":10,"b":4,"id":11,"operateur":"soustraction","resultat":6.0}]
+
+# 4 POST /operations soustraction
+$ curl -s -i -X POST -H Content-Type: application/json -d {"operateur":"soustraction","a":10,"b":4} http://localhost:8888/operations
+HTTP/1.1 201 Created
+transfer-encoding: chunked
+Location: http://10.255.255.254:8082/operations/12
+Content-Type: application/json
+Date: Mon, 16 Nov 2026 20:14:58 GMT
+
+{"a":10,"b":4,"id":12,"operateur":"soustraction","resultat":6.0}
+
+# 5 GET /calcul/somme/detail?a=2&b=3
+$ curl -s -i http://localhost:8888/calcul/somme/detail?a=2&b=3
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 48
+Date: Mon, 16 Nov 2026 20:14:58 GMT
+
+{"operation":"somme","a":2,"b":3,"resultat":5.0}
+
+# 6 GET /bonjour
+$ curl -s -i http://localhost:8888/bonjour
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+Content-Length: 117
+
+{"timestamp":"2026-11-16T20:14:58.326Z","path":"/bonjour","status":404,"error":"Not Found","requestId":"6db9eb87-82"}
+
+# Swagger : zone Servers de /docs/calcul
+"servers":[{"url":"http://10.255.255.254:8081","description":"Generated server url"}]
+
+# Six requetes GET /calcul/somme?a=5&b=5 : instance 8081 = 3 trace(s), instance 8083 = 3 trace(s)
